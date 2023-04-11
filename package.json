@@ -1,0 +1,31 @@
+{
+  "name": "@baolq/umi-ui-system",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:watch": "tsc && vite build --watch",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.3",
+    "vite": "^4.2.0"
+  },
+  "dependencies": {
+    "@umijs/utils": "^4.0.64",
+    "path": "^0.12.7",
+    "umi": "^4.0.64"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/umi-ui-system.js",
+  "module": "./dist/umi-ui-system.js",
+  "exports": {
+    ".": {
+      "import": "./dist/umi-ui-system.js",
+      "require": "./dist/umi-ui-system.umd.cjs"
+    }
+  }
+}
