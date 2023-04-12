@@ -10,10 +10,11 @@ export default defineConfig({
       fileName: "umi-ui-system",
     },
     rollupOptions: {
-      external: ["umi"],
+      external: ["umi", "umi/plugin-utils"],
       output: {
         globals: {
           umi: "umi",
+          "umi/plugin-utils": "umi/plugin-utils",
         },
       },
     },
