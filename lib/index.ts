@@ -61,8 +61,6 @@ const objectFitStyleParser = createStyleParser('objectFit');
 
 parsersManager.add(fontSizeVariantParser);
 parsersManager.add(objectFitStyleParser);
-
-export const Box = withTwilight('div');
 `
     : ""
 }
@@ -147,9 +145,7 @@ export const SystemUiContext = React.createContext<any>(null);
   api.addRuntimePlugin(() => [withTmpPath({ api, path: "runtime.tsx" })]);
 
   if (libInstalled) {
-    api.logger.ready(
-      "Box component generated! import { Box } from '@umijs/max'"
-    );
+    api.logger.ready("Setting react-twilight successfully!");
   }
   api.logger.ready("UI system generated!");
   api.logger.info(
