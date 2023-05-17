@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, "lib/index.ts"),
       name: "@baolq/umi-ui-system",
@@ -10,11 +11,12 @@ export default defineConfig({
       fileName: "umi-ui-system",
     },
     rollupOptions: {
-      external: ["umi", "umi/plugin-utils"],
+      external: ["umi", "umi/plugin-utils", "react-twilight"],
       output: {
         globals: {
           umi: "umi",
           "umi/plugin-utils": "umi/plugin-utils",
+          "react-twilight": "react-twilight",
         },
       },
     },
