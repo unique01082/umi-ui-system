@@ -14,14 +14,17 @@ export default (api: IApi) => {
     key: "uiSystem",
     config: {
       schema(joi) {
-        return joi.object();
+        return joi.object({
+          theme: joi.object(),
+          setup: joi.function(),
+        });
       },
       onChange: api.ConfigChangeType.regenerateTmpFiles,
     },
     enableBy: api.EnableBy.config,
   });
 
-  api.addRuntimePluginKey(() => ["uiSystem"]);
+  api.addRuntimePluginKey(() => ["setupUISystem"]);
 
   let libInstalled = api.pkg.dependencies?.["react-twilight"];
   if (libInstalled) {
@@ -32,110 +35,89 @@ export default (api: IApi) => {
     );
   }
 
-  api.onGenerateFiles(async (...args) => {
+  api.onGenerateFiles(async () => {
     api.writeTmpFile({
       path: "index.ts",
-      content: `import React from 'react';
-import {SystemUiContext} from './context';
-${
-  libInstalled
-    ? `
-import {
-  addAllStyles,
-  addAllSelectors,
-  addAllVariants,
-  addAllCsses,
-  createVariantParser,
-  createStyleParser,
-  parsersManager,
-  withTwilight,
-} from 'react-twilight';
+      content: `${
+        libInstalled
+          ? `
+        import * as rt from 'react-twilight';
+        import { setupUISystem } from '@/app';
 
-addAllStyles();
-addAllSelectors();
-addAllVariants();
-addAllCsses();
+        setupUISystem(rt);
 
-const fontSizeVariantParser = createVariantParser('textSize');
-const objectFitStyleParser = createStyleParser('objectFit');
+        export const theme = ${JSON.stringify(
+          api.userConfig.uiSystem.theme,
+          null,
+          2
+        )};
 
-parsersManager.add(fontSizeVariantParser);
-parsersManager.add(objectFitStyleParser);
+        export const ColorPalette = theme.colorPalette;
 `
-    : ""
-}
-
-export const useSystemUi = () => {
-  return React.useContext(SystemUiContext);
-};
-
-export const ColorPalette = ${JSON.stringify(
-        api.userConfig.uiSystem.colorPalette,
-        null,
-        2
-      )};
+          : ""
+      }
 
       `,
     });
 
     api.writeTmpFile({
       path: "variables.less",
-      content: Object.entries(api.userConfig.uiSystem.colorPalette)
+      content: Object.entries(api.userConfig.uiSystem.theme.colorPalette)
         .map((entry) => `@${entry[0]}: ${entry[1]};`)
         .join("\n"),
     });
 
     api.writeTmpFile({
       path: "runtime.tsx",
-      content: `import React from 'react';
-import { SystemUiContext } from './context';
+      content: `import { theme } from '.';
 import { ThemeProvider } from 'react-twilight';
 
 function Provider(props) {
   return (
-    <SystemUiContext.Provider value={{a: 1}}>
-      ${
-        libInstalled
-          ? `<ThemeProvider theme={${JSON.stringify(
-              api.userConfig.uiSystem,
-              null,
-              2
-            )}}>`
-          : ""
-      }
-        { props.children }
-      ${libInstalled ? `</ThemeProvider>` : ""}
-    </SystemUiContext.Provider>
+    ${libInstalled ? `<ThemeProvider theme={theme}>` : ""}
+      {props.children}
+    ${libInstalled ? `</ThemeProvider>` : ""}
   );
 }
 
 export function outerProvider(container) {
-  return <Provider>{ container }</Provider>;
+  return <Provider>{container}</Provider>;
 }
-      `,
-    });
-
-    api.writeTmpFile({
-      path: "context.ts",
-      content: `import React from 'react';
-
-export const SystemUiContext = React.createContext<any>(null);
-      `,
-    });
-
-    api.writeTmpFile({
-      path: "context.ts",
-      content: `import React from 'react';
-
-export const SystemUiContext = React.createContext<any>(null);
 `,
     });
+  });
+
+  api.onDevCompileDone(async (opts) => {
+    if (opts.isFirstCompile) {
+      const rt = await import("react-twilight");
+
+      api.userConfig.uiSystem.setup(rt);
+
+      const { parsersManager } = rt;
+
+      const snapshot = Array.from(parsersManager).reduce((acc, t) => {
+        t.propNames.forEach((propName) => {
+          acc.set(propName, t.scaleName);
+        });
+
+        return acc;
+      }, new Map());
+
+      api.writeTmpFile({
+        path: "static.ts",
+        content: `export const snapshot = ${JSON.stringify(
+          Object.fromEntries(snapshot),
+          null,
+          2
+        )};`,
+      });
+    }
   });
 
   api.addHTMLStyles(
     () => `
     :root {
-      ${Object.entries(api.userConfig.uiSystem.colorPalette)
+      ${Object.entries(api.userConfig.uiSystem.theme.colorPalette)
         .map((entry) => `--${entry[0]}: ${entry[1]};`)
         .join("\n\t\t")}
     }
