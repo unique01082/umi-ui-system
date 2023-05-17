@@ -105,7 +105,13 @@ export function outerProvider(container) {
 
       api.writeTmpFile({
         path: "static.ts",
-        content: `export const snapshot = ${JSON.stringify(
+        content: `export type ParsersManagerSupportedKeysSnapshot = ${JSON.stringify(
+          Object.fromEntries(snapshot),
+          null,
+          2
+        )};
+
+        export const parsersManagerSupportedKeysSnapshot: ParsersManagerSupportedKeysSnapshot = ${JSON.stringify(
           Object.fromEntries(snapshot),
           null,
           2
