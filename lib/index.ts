@@ -93,8 +93,8 @@ export function outerProvider(container) {
 
       const { parsersManager } = rt;
 
-      const snapshot = Array.from(parsersManager).reduce((acc, t) => {
-        t.propNames.forEach((propName) => {
+      const snapshot = Array.from(parsersManager).reduce((acc, t: any) => {
+        t.propNames.forEach((propName: any) => {
           acc.set(propName, t.scaleName);
         });
 
