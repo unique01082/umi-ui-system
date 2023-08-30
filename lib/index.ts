@@ -27,9 +27,7 @@ export default (api: IApi) => {
   api.addRuntimePluginKey(() => ["setupUISystem"]);
 
   let libInstalled = api.pkg.dependencies?.["react-twilight"];
-  if (libInstalled) {
-    api.logger.info("react-twilight found.");
-  } else {
+  if (!libInstalled) {
     api.logger.info(
       "react-twilight not found. Skipping generating Box component."
     );
@@ -132,9 +130,6 @@ export function outerProvider(container) {
 
   api.addRuntimePlugin(() => [withTmpPath({ api, path: "runtime.tsx" })]);
 
-  if (libInstalled) {
-    api.logger.ready("Setting react-twilight successfully!");
-  }
   api.logger.ready("UI system generated!");
   api.logger.info(
     `${"import { ColorPalette } from '@umijs/max'"} OR ${"@import '.umi/plugin-uiSystem/variables.less'"}`
