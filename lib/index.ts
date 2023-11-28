@@ -101,7 +101,7 @@ export function outerProvider(container) {
         return acc;
       }, new Map());
 
-      const replacer = (key, value: any) =>
+      const replacer = (_key: string, value: any) =>
         typeof value === "undefined" ? null : value;
 
       api.writeTmpFile({

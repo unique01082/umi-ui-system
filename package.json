@@ -1,7 +1,7 @@
 {
   "name": "@baolq/umi-ui-system",
   "homepage": "https://github.com/unique01082/umi-ui-system",
-  "version": "4.1.4",
+  "version": "4.1.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
