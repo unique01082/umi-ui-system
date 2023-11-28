@@ -101,17 +101,20 @@ export function outerProvider(container) {
         return acc;
       }, new Map());
 
+      const replacer = (key, value: any) =>
+        typeof value === "undefined" ? null : value;
+
       api.writeTmpFile({
         path: "static.ts",
         content: `export type ParsersManagerSupportedKeysSnapshot = ${JSON.stringify(
           Object.fromEntries(snapshot),
-          null,
+          replacer,
           2
         )};
 
         export const parsersManagerSupportedKeysSnapshot: ParsersManagerSupportedKeysSnapshot = ${JSON.stringify(
           Object.fromEntries(snapshot),
-          null,
+          replacer,
           2
         )};`,
       });
